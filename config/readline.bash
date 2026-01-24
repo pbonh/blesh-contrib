@@ -47,6 +47,16 @@ bleopt exec_exit_mark=
 bleopt edit_marker=
 bleopt edit_marker_error=
 
+# Turn off Readline settings enabled by ble.sh
+bind 'set skip-completed-text       off'
+bind 'set colored-stats             off'
+bind 'set colored-completion-prefix off'
+
+# Use audible bell instead of visible bell for editing error
+bleopt edit_bell=abell
+bleopt decode_error_@_vbell=
+bleopt decode_error_@_abell=1
+
 function ble/contrib/config:readline/emacs-load-hook {
   # Disable magic expansions
   ble-bind -m emacs -f 'SP' self-insert
