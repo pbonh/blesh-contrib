@@ -1,6 +1,7 @@
 # ble/contrib/integration/fzf-key-bindings.bash (C) 2020-2024, akinomyoga
 
 [[ $- == *i* ]] || return 0
+: "${BLE_CONTRIB_FZF_DISABLE_HISTORY:=1}"
 
 if ! ble/is-function __fzf_history__; then
   ble-import contrib/integration/fzf-initialize || return 1
@@ -25,18 +26,20 @@ ble-bind -m emacs   -x C-t fzf-file-widget
 ble-bind -m vi_imap -x C-t fzf-file-widget
 ble-bind -m vi_nmap -s C-t 'i\C-t'
 
-# CTRL-R - Paste the selected command from history into the command line
-ble-bind -m emacs   -x C-r fzf-history-widget
-ble-bind -m vi_imap -x C-r fzf-history-widget
-ble-bind -m vi_nmap -s C-r 'i\C-r'
-function fzf-history-widget {
-  ble/util/assign READLINE_LINE '__fzf_history__'
-  ble/util/assign READLINE_LINE 'history -p "$READLINE_LINE"'
-  READLINE_POINT=${#READLINE_LINE}
-}
-((_ble_bash>=40000)) &&
-  ble/contrib/integration:fzf-key-bindings/is-fzf-above-7c447bbd &&
-  function fzf-history-widget { __fzf_history__; }
+if ((BLE_CONTRIB_FZF_DISABLE_HISTORY==0)); then
+  # CTRL-R - Paste the selected command from history into the command line
+  ble-bind -m emacs   -x C-r fzf-history-widget
+  ble-bind -m vi_imap -x C-r fzf-history-widget
+  ble-bind -m vi_nmap -s C-r 'i\C-r'
+  function fzf-history-widget {
+    ble/util/assign READLINE_LINE '__fzf_history__'
+    ble/util/assign READLINE_LINE 'history -p "$READLINE_LINE"'
+    READLINE_POINT=${#READLINE_LINE}
+  }
+  ((_ble_bash>=40000)) &&
+    ble/contrib/integration:fzf-key-bindings/is-fzf-above-7c447bbd &&
+    function fzf-history-widget { __fzf_history__; }
+fi
 
 # ALT-C - cd into the selected directory
 ble-bind -m emacs   -c M-c 'ble/util/eval-stdout "__fzf_cd__"'
